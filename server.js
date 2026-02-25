@@ -5,27 +5,29 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3000;
-
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.send("RT AI Backend Running 🚀");
 });
 
-// Live Result
+// LIVE DATA ROUTE
 app.get("/api/live", async (req, res) => {
   try {
-    const response = await fetch("https://draw.ar-lottery01.com/WinGo/WinGo_1M.json");
+    const response = await fetch(
+      "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json"
+    );
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch live data" });
+    res.status(500).json({ error: "Live fetch failed" });
   }
 });
 
-// Analyze Route
+// ANALYZE ROUTE
 app.get("/api/analyze", async (req, res) => {
   try {
-    const response = await fetch("https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json");
+    const response = await fetch(
+      "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json"
+    );
     const data = await response.json();
 
     const results = data.data.list.map(item => parseInt(item.number));
@@ -53,14 +55,13 @@ app.get("/api/analyze", async (req, res) => {
 
     res.json({
       totalRounds: results.length,
-      frequency,
+      hotNumber,
+      coldNumber,
       big,
       small,
       odd,
       even,
-      hotNumber,
-      coldNumber,
-      suggestion: `Based on trend, ${hotNumber} has higher probability`
+      suggestion: `Trend suggests ${hotNumber} is hot`
     });
 
   } catch (error) {
@@ -68,6 +69,5 @@ app.get("/api/analyze", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log("Server running on port " + PORT));
